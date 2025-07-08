@@ -1,6 +1,8 @@
 # 偽PAC2 for PASOPIA7
 
 ## WORK IN PROGRESS
+現在作成中のためドキュメントにかかれていても実装だったり、
+不安定な機能があります。
 
 ## これはなに？
 
@@ -19,14 +21,16 @@ PASOPIA7 では PAC2 は自動切換されます。
 
 PAC2 用のコネクタの信号を、単純に Raspberry Pi Pico2 に接続しただけです。
 Pico2 が 5V 耐性なのを良いことに直結しています。
+なので必ず Pico2 が必要です。初代 Pico では動作しません。
+なお Pico2 W での動作は未確認です。
 
 ![Schematics](/schematics.png)
 
-PAC2 のコネクタは PASOPIA 正面から見て右側が Pin1 になっています。
+PAC2 のコネクタは PASOPIA7 正面から見て右側が Pin1 になっています。
 
 ![PAC2 Connector](/pac2connector.jpg)
 
-PASOPIA に接続する前に、偽PAC2 の実行イメージ `nisepac2.uf2` を Pico に書き込んでください。
+PASOPIA に接続する前に、偽PAC2 の実行イメージ `nisepac2.uf2` を Pico2 に書き込んでください。
 
 ---
 ## 漢字PAC
@@ -42,7 +46,7 @@ picotool.exe load -v -x kanji.rom  -t bin -o 0x10060000
 ## RAMPAC
 
 64KiB の RAMPAC が 2 台接続されているように見えます。
-Pico2 のフラッシュ上に 0 ~ 47 までの 48 台の RAMPAC のデータがあって、
+Pico2 のフラッシュ上に 0 ~ 55 までの 56 台の RAMPAC のデータがあって、
 その中の 2 台が接続されているように見えます。
 
 RAMPAC の切り替えは、slot 5 に切り替え後、&H18 ないし &H19 へ出力することで行います。
