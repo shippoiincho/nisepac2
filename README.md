@@ -20,8 +20,11 @@ PASOPIA7 では PAC2 は自動切換されます。
 PAC2 用のコネクタの信号を、単純に Raspberry Pi Pico2 に接続しただけです。
 Pico2 が 5V 耐性なのを良いことに直結しています。
 
+![Schematics](/schematics.png)
+
 PAC2 のコネクタは PASOPIA 正面から見て右側が Pin1 になっています。
 
+![PAC2 Connector](/pac2connector.jpg)
 
 PASOPIA に接続する前に、偽PAC2 の実行イメージ `nisepac2.uf2` を Pico に書き込んでください。
 
