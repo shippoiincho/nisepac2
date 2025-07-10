@@ -1,9 +1,5 @@
 # 偽PAC2 for PASOPIA7
 
-## WORK IN PROGRESS
-現在作成中のためドキュメントにかかれていても実装だったり、
-不安定な機能があります。
-
 ## これはなに？
 
 PASOPIA7 で PAC2 のまねをするモジュールです。
@@ -72,6 +68,9 @@ OUT &H1B,5:PRINT INP(&H1A)
 0 が帰ってくれば未書き込みデータはありません。
 
 ---
-## JoyPAC (未テスト)
+## JoyPAC
 
-USB の DirectInput 対応ゲームパットまたは Joystick をサポートします。
+USB の DirectInput 対応ゲームパットまたは Joystick を 1 台サポートします。
+Joystick 端子 A に接続されているように見えます。
+
+なお、PASOPIA の 5V が USB に直結されますので、接続には注意してください。
