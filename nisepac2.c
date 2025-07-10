@@ -327,10 +327,6 @@ static inline void io_write(uint16_t address, uint8_t data)
 
             switch(pacmode) {
 
-                case 1: // Switch RAMPAC on slot 4
-
-                    break;
-
                 case 2:
                     kanjipacptr&=0x100ff;
                     kanjipacptr|=data<<8;  
@@ -363,10 +359,6 @@ static inline void io_write(uint16_t address, uint8_t data)
         case 2:  // PAC (High or DATA write) 
 
             switch(pacmode) {
-
-                case 1: // Switch RAMPAC on slot 3
-
-                    break;
 
                 case 2:
                     kanjipacptr&=0xffff;
