@@ -9,7 +9,6 @@
 //  GP12: CDRD
 
 
-#define DEBUG
 #define FLASH_INTERVAL 300      // 5sec
 
 #include <stdio.h>
@@ -22,11 +21,9 @@
 //#include "hardware/pio.h"
 #include "hardware/clocks.h"
 #include "hardware/timer.h"
-//#include "hardware/dma.h"
 #include "hardware/uart.h"
 #include "hardware/flash.h"
 #include "hardware/sync.h"
-//#include "hardware/pwm.h"
 #include "hardware/vreg.h"
 
 #include "tusb.h"
@@ -223,7 +220,6 @@ uint8_t  rampac_load(uint8_t pac,uint8_t page) {
 }
 
 static inline uint8_t io_read( uint16_t address)
-//static inline uint8_t __not_in_flash_func(io_read)( uint16_t address)
 {
 
     uint8_t b;
@@ -250,8 +246,7 @@ static inline uint8_t io_read( uint16_t address)
 
         case 4:
 
-//            return rampac1[rampac1ptr&0xffff];
-            return rampac1[rampac1ptr];
+            return rampac1[rampac1ptr&0xffff];
 
         case 5:  // NisePAC2 control
 
@@ -291,7 +286,6 @@ static inline uint8_t io_read( uint16_t address)
 }
 
 static inline void io_write(uint16_t address, uint8_t data)
-//static inline void __not_in_flash_func(io_write)(uint16_t address, uint8_t data)
 {
 
     uint8_t b;
@@ -428,6 +422,7 @@ void init_emulator(void) {
 }
 
 // Main thread (Core1)
+
 void __not_in_flash_func(main_core1)(void) {
 //void main_core1(void) {
 
@@ -441,12 +436,6 @@ void __not_in_flash_func(main_core1)(void) {
 
     gpio_init_mask(0x1fff);
     gpio_set_dir_all_bits(0xffffe000);  
-
-#ifdef DEBUG
-    gpio_init(25);
-    gpio_set_dir(25,1);
-    gpio_put(25,0);
-#endif
 
     while(1) {
 
@@ -520,8 +509,6 @@ int main() {
     multicore_launch_core1(main_core1);
     multicore_lockout_victim_init();
 
-//    sleep_ms(1);
-
     init_emulator();
 
     rampac_load(1,rampac1page);
@@ -534,8 +521,6 @@ int main() {
     add_repeating_timer_us(16666,timer_handler,NULL  ,&timer);
 
     while(1) {
-
-//        tight_loop_contents();
         
         while(vsflag==0) {
 
