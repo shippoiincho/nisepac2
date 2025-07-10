@@ -32,8 +32,6 @@
 #include "tusb.h"
 #include "bsp/board.h"
 
-#include "lfs.h"
-
 // ROM configuration
 
 #define ROMBASE 0x10080000u
@@ -44,7 +42,7 @@ uint8_t *rampacs =(uint8_t *)(ROMBASE);
 
 // RAM configuration (224KiB)
 
-uint8_t rampac0[0x10000];   // For Utilities (slot 5)
+//uint8_t rampac0[0x10000];   // For Utilities (slot 5)
 uint8_t rampac1[0x10000];   // Slot 4
 uint8_t rampac2[0x10000];   // Slot 3
 uint8_t kanjipac[0x20000];  // Slot 2
@@ -52,10 +50,10 @@ uint8_t kanjipac[0x20000];  // Slot 2
 #define MAXPACPAGE 56       // = 3.5MiB/64KiB
 
 volatile uint8_t pacmode=0;
-volatile uint32_t rampac0ptr=0;
-volatile uint32_t rampac1ptr=0;
-volatile uint32_t rampac2ptr=0;
-volatile uint32_t kanjipacptr=0;
+
+uint32_t rampac1ptr=0;
+uint32_t rampac2ptr=0;
+uint32_t kanjipacptr=0;
 
 volatile uint8_t rampac1page=0;
 volatile uint8_t rampac2page=1;
@@ -225,6 +223,7 @@ uint8_t  rampac_load(uint8_t pac,uint8_t page) {
 }
 
 static inline uint8_t io_read( uint16_t address)
+//static inline uint8_t __not_in_flash_func(io_read)( uint16_t address)
 {
 
     uint8_t b;
@@ -242,6 +241,7 @@ static inline uint8_t io_read( uint16_t address)
 
         case 2:
 
+//            return kanjirom[kanjipacptr&0x1ffff];
             return kanjipac[kanjipacptr&0x1ffff];
 
         case 3:
@@ -250,7 +250,8 @@ static inline uint8_t io_read( uint16_t address)
 
         case 4:
 
-            return rampac1[rampac1ptr&0xffff];
+//            return rampac1[rampac1ptr&0xffff];
+            return rampac1[rampac1ptr];
 
         case 5:  // NisePAC2 control
 
@@ -290,6 +291,7 @@ static inline uint8_t io_read( uint16_t address)
 }
 
 static inline void io_write(uint16_t address, uint8_t data)
+//static inline void __not_in_flash_func(io_write)(uint16_t address, uint8_t data)
 {
 
     uint8_t b;
@@ -301,17 +303,17 @@ static inline void io_write(uint16_t address, uint8_t data)
             switch(pacmode) {
 
                 case 2:
-                    kanjipacptr&=0xffff00;
+                    kanjipacptr&=0x1ff00;
                     kanjipacptr|=data;
                     break;
 
                 case 3:
-                    rampac2ptr&=0xffff00;
+                    rampac2ptr&=0xff00;
                     rampac2ptr|=data;
                     break;
                     
                 case 4:
-                    rampac1ptr&=0xffff00;
+                    rampac1ptr&=0xff00;
                     rampac1ptr|=data;
                     break;
 
@@ -336,17 +338,17 @@ static inline void io_write(uint16_t address, uint8_t data)
                     break;
 
                 case 2:
-                    kanjipacptr&=0xff00ff;
+                    kanjipacptr&=0x100ff;
                     kanjipacptr|=data<<8;  
                     break;
 
                 case 3:
-                    rampac2ptr&=0xff00ff;
+                    rampac2ptr&=0x00ff;
                     rampac2ptr|=data<<8;
                     break;
                     
                 case 4:
-                    rampac1ptr&=0xff00ff;
+                    rampac1ptr&=0x00ff;
                     rampac1ptr|=data<<8;
                     break;
 
@@ -375,16 +377,22 @@ static inline void io_write(uint16_t address, uint8_t data)
                 case 2:
                     kanjipacptr&=0xffff;
                     kanjipacptr|=data<<16;  
+                    kanjipacptr&=0x1ffff;
                     break;
 
                 case 3:
-                    rampac2[rampac2ptr&0xffff]=data;
-                    rampac2count=vscount;
+
+                    if(rampac2[rampac2ptr&0xffff]!=data) {
+                        rampac2[rampac2ptr&0xffff]=data;
+                        rampac2count=vscount;
+                    }
                     break;
                     
                 case 4:
-                    rampac1[rampac1ptr&0xffff]=data;
-                    rampac1count=vscount;
+                    if(rampac1[rampac1ptr&0xffff]!=data) {
+                        rampac1[rampac1ptr&0xffff]=data;
+                        rampac1count=vscount;
+                    }
                     break;
 
                 default:
@@ -423,14 +431,16 @@ void init_emulator(void) {
 void __not_in_flash_func(main_core1)(void) {
 //void main_core1(void) {
 
-    uint32_t bus,control,address,data;
+    volatile uint32_t bus;
+
+    uint32_t control,address,data;
 
 //    uint32_t redraw_start,redraw_length;
 
     multicore_lockout_victim_init();
 
     gpio_init_mask(0x1fff);
-    gpio_set_dir_all_bits(0xffff9000);  
+    gpio_set_dir_all_bits(0xffffe000);  
 
 #ifdef DEBUG
     gpio_init(25);
@@ -449,14 +459,15 @@ void __not_in_flash_func(main_core1)(void) {
         if(control==0x1000) { // Write
 
             address=(bus&0x300)>>8;
-            
+            data=bus&0xff;
+
+            io_write(address,data);
+
             // Wait deactivate CDWR
             while(control==0) {
                 bus=gpio_get_all();
                 control=bus&0x800;
             }
-
-            io_write(address,bus&0xff);
 
             continue;
 
@@ -509,7 +520,7 @@ int main() {
     multicore_launch_core1(main_core1);
     multicore_lockout_victim_init();
 
-    sleep_ms(1);
+//    sleep_ms(1);
 
     init_emulator();
 
@@ -524,6 +535,8 @@ int main() {
 
     while(1) {
 
+//        tight_loop_contents();
+        
         while(vsflag==0) {
 
             // Change RAMPAC page
@@ -602,6 +615,5 @@ int main() {
             }
         }
     }
-
 }
 

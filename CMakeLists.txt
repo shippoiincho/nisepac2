@@ -37,7 +37,7 @@ pico_sdk_init()
 
 add_executable(nisepac2 nisepac2.c )
 
-target_sources(nisepac2 PRIVATE nisepac2.c hid_app.c joystick.c hidparser/hidparser.c lfs.c lfs_util.c)
+target_sources(nisepac2 PRIVATE nisepac2.c hid_app.c joystick.c hidparser/hidparser.c)
 
 pico_set_program_name(nisepac2 "nisepac2")
 pico_set_program_version(nisepac2 "0.1")
@@ -54,6 +54,8 @@ target_link_libraries(nisepac2
 target_include_directories(nisepac2 PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
+
+#pico_set_binary_type(nisepac2 no_flash)
 
 pico_add_extra_outputs(nisepac2)
 
