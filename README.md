@@ -11,6 +11,7 @@ PASOPIA7 で PAC2 のまねをするモジュールです。
 - Slot2: 漢字 PAC
 - Slot3: 64k RAMPAC (ドライブ6)
 - Slot4: 64k RAMPAC (ドライブ5)
+- Slot5: (RAMPAC 制御用)
 
 PASOPIA7 では PAC2 のスロットは自動切換されます。
 初代 PASOPIA でも動くはずですが動作確認とっていません。
@@ -52,14 +53,16 @@ picotool.exe load -v -x kanji.rom  -t bin -o 0x10060000
 Pico2 のフラッシュ上に 0 ~ 55 までの 56 台の RAMPAC のデータがあって、
 その中の 2 台が接続されているように見えます。
 
-RAMPAC の切り替えは、slot 5 に切り替え後、&H18 ないし &H19 へ出力することで行います。
-Slot 4 の RAMPAC を切り替えるには以下のようにします
+RAMPAC の切り替えは、slot 5 に切り替え後、OUT 命令で &H18 (Slot 4) ないし &H19 (Slot 3) へ RAMPAC 番号を出力することで行います。
+Slot 4 の RAMPAC を 2 番に切り替えるには以下のようにします
 
 ```
 OUT &H1B,5:OUT &H18,2
 ```
 
 未使用の RAMPAC を接続すると自動的に初期化されますので、フォーマットは不要です。
+
+また　slot 5 の状態で、INP() 関数で &H18 ないし &H19 を読み出すと、現在接続中の RAMPAC 番号が取得できます。
 
 電源オン時には、0 番と 1 番の RAMPAC がそれぞれ、Slot 4 と 3 に接続されているように見えます。
 また、同じ番号の RAMPAC を両方のスロットに同時に接続することはできません。
