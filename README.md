@@ -34,7 +34,7 @@ PASOPIA に接続する前に、偽PAC2 の実行イメージ `nisepac2.uf2` を
 ---
 ## 漢字PAC
 
-![KANJI PAC](/pictures/kanji.jpg)
+![KANJI PAC](/pictures/kanjipac.jpg)
 
 漢字PAC のエミュレートをします。
 あらかじめ picotool などで漢字 ROM のデータを書き込んでおく必要があります。
