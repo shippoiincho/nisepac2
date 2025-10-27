@@ -424,7 +424,7 @@ void __not_in_flash_func(main_core1)(void) {
 
 //    uint32_t redraw_start,redraw_length;
 
-    multicore_lockout_victim_init();
+//    multicore_lockout_victim_init();
 
     gpio_init_mask(0x1fff);
     gpio_set_dir_all_bits(0xffffe000);  
@@ -445,6 +445,7 @@ void __not_in_flash_func(main_core1)(void) {
             io_write(address,data);
 
             // Wait deactivate CDWR
+//            control=0;
             while(control==0) {
                 bus=gpio_get_all();
                 control=bus&0x800;
@@ -467,7 +468,7 @@ void __not_in_flash_func(main_core1)(void) {
             gpio_put_masked(0xff,data);
 
             // Wait deactivate CDRD
-
+            control=0;
             while(control==0) {
                 bus=gpio_get_all();
                 control=bus&0x1000;
@@ -499,7 +500,7 @@ int main() {
 
 
     multicore_launch_core1(main_core1);
-    multicore_lockout_victim_init();
+//    multicore_lockout_victim_init();
 
     init_emulator();
 
