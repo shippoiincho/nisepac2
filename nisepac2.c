@@ -439,13 +439,21 @@ void __not_in_flash_func(main_core1)(void) {
 
         if(control==0x1000) { // Write
 
+//      WAIT 40ns
+            asm volatile("nop \n nop \n nop");
+            asm volatile("nop \n nop \n nop");
+            asm volatile("nop \n nop \n nop");
+            asm volatile("nop \n nop \n nop");
+
+            bus=gpio_get_all();
+
             address=(bus&0x300)>>8;
             data=bus&0xff;
 
             io_write(address,data);
 
             // Wait deactivate CDWR
-//            control=0;
+            control=0;
             while(control==0) {
                 bus=gpio_get_all();
                 control=bus&0x800;
@@ -454,6 +462,15 @@ void __not_in_flash_func(main_core1)(void) {
             continue;
 
         } else if(control==0x800) { // Read
+
+//      WAIT 40ns
+            asm volatile("nop \n nop \n nop");
+            asm volatile("nop \n nop \n nop");
+            asm volatile("nop \n nop \n nop");
+            asm volatile("nop \n nop \n nop");
+
+            bus=gpio_get_all();
+
 
             address=(bus&0x300)>>8;
 
